@@ -62,9 +62,7 @@ def prep_nlp_data(df):
     Take in df with raw content, create new columns for cleaned content, stemmed content, and lemmatized content
     '''
     df = df.rename(columns={'content' : 'original'})
-    df['clean'] = df.original.apply(basic_clean)
-    df['clean'] = df.clean.apply(tokenize)
-    df['clean'] = df.clean.apply(remove_stopwords)
+    df['clean'] = df.original.apply(basic_clean).apply(tokenize).apply(remove_stopwords)
     df['stemmed'] = df.clean.apply(stem)
     df['lemmatized'] = df.clean.apply(lemmatize)
     return df
