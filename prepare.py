@@ -15,8 +15,17 @@ def basic_clean(some_string):
     Takes in a string and makes all characters lowercased, normalizes unicode characters, and removes any character that is not a letter, number, ', or space
     '''
     some_string = some_string.lower()
-    some_string = unicodedata.normalize('NFKD', some_string).encode('ascii', 'ignore').decode('utf-8')
+    some_string = unicodedata.normalize('NFKD', some_string).encode('ascii', 'ignore').decode('utf-8', 'ignore')
     some_string = re.sub(r"[^a-z0-9'\s]", '', some_string)
+    return some_string
+
+def basic_clean_spam(some_string):
+    '''
+    Takes in a string and makes all characters lowercased, normalizes unicode characters, and removes any character that is not a letter, number, or space
+    '''
+    some_string = some_string.lower()
+    some_string = unicodedata.normalize('NFKD', some_string).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+    some_string = re.sub(r"[^a-z0-9\s]", '', some_string)
     return some_string
 
 def tokenize(some_string):
@@ -63,6 +72,15 @@ def prep_nlp_data(df):
     '''
     df = df.rename(columns={'content' : 'original'})
     df['clean'] = df.original.apply(basic_clean).apply(tokenize).apply(remove_stopwords)
+    df['stemmed'] = df.clean.apply(stem)
+    df['lemmatized'] = df.clean.apply(lemmatize)
+    return df
+
+def prep_nlp(df, original_text_col = 'original'):
+    '''
+    Take in df with raw content, create new columns for cleaned content, stemmed content, and lemmatized content
+    '''
+    df['clean'] = df[original_text_col].apply(basic_clean).apply(tokenize).apply(remove_stopwords)
     df['stemmed'] = df.clean.apply(stem)
     df['lemmatized'] = df.clean.apply(lemmatize)
     return df
